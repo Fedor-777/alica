@@ -27,7 +27,7 @@ logging.basicConfig(level=logging.INFO)
 sessionStorage = {}
 
 
-@app.route('/post', methods=['POST'])
+@app.route('/', methods=['POST'])
 # Функция получает тело запроса и возвращает ответ.
 # Внутри функции доступен request.json - это JSON,
 # который отправила нам Алиса в запросе POST
@@ -68,10 +68,11 @@ def handle_dialog(req, res):
                 "Не хочу.",
                 "Не буду.",
                 "Отстань!",
-            ]
+            ],
+            "animal": "Слона"
         }
         # Заполняем текст ответа
-        res['response']['text'] = 'Привет! Купи слона!'
+        res['response']['text'] = f'Привет! Купи {sessionStorage[user_id]["animal"]}!'
         # Получим подсказки
         res['response']['buttons'] = get_suggests(user_id)
         return
@@ -93,13 +94,15 @@ def handle_dialog(req, res):
             'хорошо'
         ]:
             # Пользователь согласился, прощаемся.
-            res['response']['text'] = 'Слона можно найти на Яндекс.Маркете!'
-            res['response']['end_session'] = True
+            res['response']['text'] = f'{sessionStorage[user_id]["animal"]} можно найти на Яндекс.Маркете!'
+            # res['response']['end_session'] = True
+            sessionStorage[user_id]["animal"] = "Кролика"
+            res['response']['text'] = f'А купи {sessionStorage[user_id]["animal"]}'
             return
 
     # Если нет, то убеждаем его купить слона!
     res['response']['text'] = \
-        f"Все говорят '{req['request']['original_utterance']}', а ты купи слона!"
+        f"Все говорят '{req['request']['original_utterance']}', а ты купи {sessionStorage[user_id]['animal']}!"
     res['response']['buttons'] = get_suggests(user_id)
 
 
